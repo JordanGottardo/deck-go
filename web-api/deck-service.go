@@ -14,10 +14,11 @@ type DeckService interface {
 type service struct{}
 
 var (
-	r DeckRepository = NewInMemoryDeckRepository()
+	deckRepo DeckRepository
 )
 
-func NewDeckService() DeckService {
+func NewDeckService(repository DeckRepository) DeckService {
+	deckRepo = repository
 	return &service{}
 }
 
@@ -30,5 +31,5 @@ func (*service) Validate(deck *Deck) error {
 
 func (*service) Create(deck *Deck) (*Deck, error) {
 	deck.Id = uuid.NewString()
-	return r.Save(deck)
+	return deckRepo.Save(deck)
 }
