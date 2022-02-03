@@ -1,7 +1,7 @@
 package main
 
 type deck struct {
-	id         string
+	Id         string `json:"id"`
 	isShuffled bool
 	cards      []card
 }
@@ -14,7 +14,7 @@ type card struct {
 var suits []string = []string{"Spades, Diamonds, Clubs, Hearts"}
 var values []string = []string{"Ace", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Jack", "Queen", "King"}
 
-func newDeck() deck {
+func newDeck(id string) deck {
 	var cards []card = make([]card, 0)
 
 	for i := 0; i < len(suits); i++ {
@@ -29,6 +29,7 @@ func newDeck() deck {
 	}
 
 	return deck{
+		Id:    id,
 		cards: cards,
 	}
 }
