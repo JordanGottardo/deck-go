@@ -1,13 +1,12 @@
 package main
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 )
 
 type DeckService interface {
-	Validate(deck *Deck) error
 	Create(createDeckDto CreateDeckDto) (*Deck, error)
 	Get(id string) (*Deck, error)
 	DrawCards(deckId string, amount int) ([]card, error)
@@ -36,13 +35,6 @@ func NewDeckService(repository DeckRepository) DeckService {
 	return &service{}
 }
 
-func (*service) Validate(deck *Deck) error {
-	if deck == nil {
-		return errors.New("Deck is nil")
-	}
-	return nil
-}
-
 func (*service) Create(createDeckDto CreateDeckDto) (*Deck, error) {
 	var deck Deck
 	if len(createDeckDto.RequestedCards) > 0 {
@@ -54,10 +46,12 @@ func (*service) Create(createDeckDto CreateDeckDto) (*Deck, error) {
 
 		deck = newDeckWithRequestedCards(cards)
 	} else {
+		fmt.Println("NewDeck")
 		deck = newDeck()
 	}
 
 	if createDeckDto.Shuffled {
+		fmt.Println("Shuffling deck")
 		deck.Shuffle()
 	}
 	deck.Id = uuid.NewString()

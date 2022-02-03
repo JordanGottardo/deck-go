@@ -118,11 +118,11 @@ func ToGetDeckDto(deck *Deck) GetDeckDto {
 	getDeckDto := GetDeckDto{
 		Id:         deck.Id,
 		Shuffled:   deck.IsShuffled,
-		Remanining: deck.remainingCards(),
+		Remanining: deck.RemainingCards(),
 	}
 
 	getCardsDto := make([]CardDto, 0)
-	for _, card := range deck.cards {
+	for _, card := range deck.Cards {
 		getCardsDto = append(getCardsDto, ToCardDto(card))
 	}
 	getDeckDto.Cards = getCardsDto

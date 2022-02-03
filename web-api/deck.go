@@ -11,7 +11,7 @@ import (
 type Deck struct {
 	Id         string
 	IsShuffled bool
-	cards      []card
+	Cards      []card
 }
 
 type card struct {
@@ -63,48 +63,48 @@ func newDeck() Deck {
 	}
 
 	return Deck{
-		cards: cards,
+		Cards: cards,
 	}
 }
 
 func newDeckWithRequestedCards(requestedCards []card) Deck {
 	return Deck{
-		cards: requestedCards,
+		Cards: requestedCards,
 	}
 }
 
-func (d *Deck) remainingCards() int {
-	return len(d.cards)
+func (d *Deck) RemainingCards() int {
+	return len(d.Cards)
 }
 
 func (d *Deck) Shuffle() {
 	fmt.Println("Shuffling deck")
 	d.IsShuffled = true
-	if len(d.cards) < 2 {
+	if len(d.Cards) < 2 {
 		return
 	}
 
 	source := rand.NewSource(time.Now().UnixMicro())
 	r := rand.New(source)
 
-	for i := range d.cards {
-		newPosition := r.Intn(len(d.cards) - 1)
+	for i := range d.Cards {
+		newPosition := r.Intn(len(d.Cards) - 1)
 
-		d.cards[i], d.cards[newPosition] = d.cards[newPosition], d.cards[i]
+		d.Cards[i], d.Cards[newPosition] = d.Cards[newPosition], d.Cards[i]
 	}
 }
 
 func (d *Deck) Draw(amount int) ([]card, error) {
 	fmt.Println("Drawing cards ", amount)
 
-	if amount > d.remainingCards() {
+	if amount > d.RemainingCards() {
 		return nil, NotEnoughCardsError("Not enough cards")
 	}
 
-	drawnCards := d.cards[:amount]
-	d.cards = d.cards[amount:]
+	drawnCards := d.Cards[:amount]
+	d.Cards = d.Cards[amount:]
 
-	fmt.Println(len(d.cards))
+	fmt.Println(len(d.Cards))
 
 	return drawnCards, nil
 }
@@ -117,6 +117,6 @@ func (d *Deck) MarshalJSON() ([]byte, error) {
 	}{
 		Id:         d.Id,
 		Shuffled:   d.IsShuffled,
-		Remanining: d.remainingCards(),
+		Remanining: d.RemainingCards(),
 	})
 }
