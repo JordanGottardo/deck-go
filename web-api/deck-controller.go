@@ -3,18 +3,16 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/google/uuid"
 )
 
 var (
-	deckRepo deckRepository = newInMemoryDeckRepository()
+	deckService DeckService = NewDeckService()
 )
 
 func createNewDeck(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Set("Content-type", "application/json")
-	deck := newDeck(uuid.NewString())
-	deckRepo.save(&deck)
+	newDeck := newDeck()
+	deck, _ := deckService.Create(&newDeck)
 	result, err := json.Marshal(deck)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)

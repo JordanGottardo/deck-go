@@ -1,6 +1,6 @@
 package main
 
-type deck struct {
+type Deck struct {
 	Id         string `json:"id"`
 	isShuffled bool
 	cards      []card
@@ -14,7 +14,7 @@ type card struct {
 var suits []string = []string{"Spades, Diamonds, Clubs, Hearts"}
 var values []string = []string{"Ace", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Jack", "Queen", "King"}
 
-func newDeck(id string) deck {
+func newDeck() Deck {
 	var cards []card = make([]card, 0)
 
 	for i := 0; i < len(suits); i++ {
@@ -28,12 +28,11 @@ func newDeck(id string) deck {
 		}
 	}
 
-	return deck{
-		Id:    id,
+	return Deck{
 		cards: cards,
 	}
 }
 
-func (d *deck) remainingCards() int {
+func (d *Deck) remainingCards() int {
 	return len(d.cards)
 }
