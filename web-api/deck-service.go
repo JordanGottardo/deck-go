@@ -8,10 +8,17 @@ import (
 
 type DeckService interface {
 	Validate(deck *Deck) error
-	Create(deck *Deck) (*Deck, error)
+	Create(createDeckDto CreateDeckDto) (*Deck, error)
 }
 
 type service struct{}
+
+type CreateDeckDto struct {
+	Shuffled      bool
+	RequiredCards []RequiredCard
+}
+
+type RequiredCard = string
 
 var (
 	deckRepo DeckRepository
@@ -29,7 +36,11 @@ func (*service) Validate(deck *Deck) error {
 	return nil
 }
 
-func (*service) Create(deck *Deck) (*Deck, error) {
+func (*service) Create(createDeckDto CreateDeckDto) (*Deck, error) {
+	deck := newDeck()
+	if createDeckDto.Shuffled {
+		deck.Shuffle()
+	}
 	deck.Id = uuid.NewString()
-	return deckRepo.Save(deck)
+	return deckRepo.Save(&deck)
 }

@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 )
 
 var (
@@ -22,8 +24,13 @@ func NewDeckController(service DeckService) DeckController {
 
 func (c *controller) CreateNewDeck(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Set("Content-type", "application/json")
-	newDeck := newDeck()
-	deck, _ := deckService.Create(&newDeck)
+	shuffled, _ := strconv.ParseBool((req.URL.Query()["shuffled"][0]))
+	fmt.Println(shuffled)
+	createDeckDto := CreateDeckDto{
+		Shuffled:      shuffled,
+		RequiredCards: []RequiredCard{},
+	}
+	deck, _ := deckService.Create(createDeckDto)
 	result, err := json.Marshal(deck)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)

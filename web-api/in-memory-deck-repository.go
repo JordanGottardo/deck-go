@@ -13,6 +13,5 @@ func NewInMemoryDeckRepository() DeckRepository {
 func (r *repo) Save(deck *Deck) (*Deck, error) {
 	r.decks = append(r.decks, *deck)
 	fmt.Println("Saved deck with ID ", deck.Id)
-	fmt.Println("Now decks are ", r.decks)
 	return deck, nil
 }
