@@ -57,6 +57,21 @@ func (d *Deck) Shuffle() {
 	}
 }
 
+func (d *Deck) Draw(amount int) ([]card, error) {
+	fmt.Println("Drawing cards ", amount)
+
+	if amount > d.remainingCards() {
+		return nil, NotEnoughCardsError("Not enough cards")
+	}
+
+	drawnCards := d.cards[:amount]
+	d.cards = d.cards[amount:]
+
+	fmt.Println(len(d.cards))
+
+	return drawnCards, nil
+}
+
 func (d *Deck) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Id         string `json:"deck_id"`

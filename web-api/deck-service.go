@@ -10,6 +10,7 @@ type DeckService interface {
 	Validate(deck *Deck) error
 	Create(createDeckDto CreateDeckDto) (*Deck, error)
 	Get(id string) (*Deck, error)
+	DrawCards(deckId string, amount int) ([]card, error)
 }
 
 type service struct{}
@@ -48,4 +49,8 @@ func (*service) Create(createDeckDto CreateDeckDto) (*Deck, error) {
 
 func (*service) Get(id string) (*Deck, error) {
 	return deckRepo.Get(id)
+}
+
+func (*service) DrawCards(deckId string, amount int) ([]card, error) {
+	return deckRepo.DrawCards(deckId, amount)
 }

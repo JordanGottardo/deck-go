@@ -7,7 +7,9 @@ func main() {
 	deckController := NewDeckController(deckService)
 	httpRouter := NewMuxRouter()
 
-	httpRouter.Get("/decks/{id}", deckController.GetDeck)
 	httpRouter.Post("/decks", deckController.CreateNewDeck)
+	httpRouter.Get("/decks/{id}", deckController.GetDeck)
+	httpRouter.Post("/decks/{id}/draw", deckController.DrawCards)
+
 	httpRouter.Serve((port))
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type repo struct {
-	decks []Deck
+	decks []*Deck
 }
 
 func NewInMemoryDeckRepository() DeckRepository {
@@ -14,15 +14,30 @@ func NewInMemoryDeckRepository() DeckRepository {
 }
 
 func (r *repo) Save(deck *Deck) (*Deck, error) {
-	r.decks = append(r.decks, *deck)
+	r.decks = append(r.decks, deck)
 	fmt.Println("Saved deck with ID ", deck.Id)
 	return deck, nil
 }
 
 func (r *repo) Get(id string) (*Deck, error) {
-	for _, deck := range r.decks{
+	return r.getDeck(id)
+}
+
+func (r *repo) DrawCards(id string, amount int) ([]card, error) {
+	fmt.Println("Repo drawCards")
+	deck, err := r.getDeck(id)
+
+	if err != nil {
+		return nil, DeckNotFoundError("Deck not found")
+	}
+
+	return deck.Draw(amount)
+}
+
+func (r *repo) getDeck(id string) (*Deck, error) {
+	for _, deck := range r.decks {
 		if deck.Id == id {
-			return &deck, nil
+			return deck, nil
 		}
 	}
 
