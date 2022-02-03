@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -20,6 +21,32 @@ type card struct {
 
 var suits []string = []string{"SPADES", "DIAMONDS", "CLUBS", "HEARTS"}
 var values []string = []string{"ACE", "1", "2", "3", "4", "5", "6", "7", "8", "9", "JACK", "QUEEN", "KING"}
+
+func GetCard(valueInitial string, suitInitial string) (card, error) {
+	var card card
+
+	for _, suit := range suits {
+		fmt.Println(suit, suitInitial)
+		if strings.HasPrefix(suit, suitInitial) {
+			card.suit = suit
+			break
+		}
+	}
+
+	for _, value := range values {
+		if strings.HasPrefix(value, valueInitial) {
+			card.value = value
+			break
+		}
+	}
+
+	if card.suit == "" || card.value == "" {
+		return card, InvalidCardError("Invalid card")
+	}
+
+	return card, nil
+
+}
 
 func newDeck() Deck {
 	var cards []card = make([]card, 0)
@@ -40,6 +67,12 @@ func newDeck() Deck {
 	}
 }
 
+func newDeckWithRequestedCards(requestedCards []card) Deck {
+	return Deck{
+		cards: requestedCards,
+	}
+}
+
 func (d *Deck) remainingCards() int {
 	return len(d.cards)
 }
@@ -47,6 +80,10 @@ func (d *Deck) remainingCards() int {
 func (d *Deck) Shuffle() {
 	fmt.Println("Shuffling deck")
 	d.IsShuffled = true
+	if len(d.cards) < 2 {
+		return
+	}
+
 	source := rand.NewSource(time.Now().UnixMicro())
 	r := rand.New(source)
 

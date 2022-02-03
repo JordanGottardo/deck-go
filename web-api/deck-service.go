@@ -16,11 +16,16 @@ type DeckService interface {
 type service struct{}
 
 type CreateDeckDto struct {
-	Shuffled      bool
-	RequiredCards []RequiredCard
+	Shuffled       bool
+	RequestedCards []RequestedCard
 }
 
-type RequiredCard = string
+type RequestedCard string
+
+func (r *RequestedCard) GetValueAndSuite() (string, string) {
+	requestedCard := string(*r)
+	return string(requestedCard[0]), string(requestedCard[1])
+}
 
 var (
 	deckRepo DeckRepository
@@ -39,12 +44,41 @@ func (*service) Validate(deck *Deck) error {
 }
 
 func (*service) Create(createDeckDto CreateDeckDto) (*Deck, error) {
-	deck := newDeck()
+	var deck Deck
+	if len(createDeckDto.RequestedCards) > 0 {
+		cards, err := ToCards(createDeckDto.RequestedCards)
+
+		if err != nil {
+			return nil, err
+		}
+
+		deck = newDeckWithRequestedCards(cards)
+	} else {
+		deck = newDeck()
+	}
+
 	if createDeckDto.Shuffled {
 		deck.Shuffle()
 	}
 	deck.Id = uuid.NewString()
 	return deckRepo.Save(&deck)
+}
+
+func ToCards(requestedCards []RequestedCard) ([]card, error) {
+	var cards []card
+
+	for _, requestedCard := range requestedCards {
+		value, suit := requestedCard.GetValueAndSuite()
+
+		card, err := GetCard(value, suit)
+		if err != nil {
+			return nil, err
+		}
+
+		cards = append(cards, card)
+	}
+
+	return cards, nil
 }
 
 func (*service) Get(id string) (*Deck, error) {

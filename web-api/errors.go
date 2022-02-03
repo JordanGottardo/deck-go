@@ -12,6 +12,12 @@ func (e NotEnoughCardsError) Error() string {
 	return string(e)
 }
 
+type InvalidCardError string
+
+func (e InvalidCardError) Error() string {
+	return string(e)
+}
+
 type ServiceError struct {
 	Message string `json:"message"`
 }

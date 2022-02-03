@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -29,12 +30,19 @@ func NewDeckController(service DeckService) DeckController {
 func (c *controller) CreateNewDeck(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Set("Content-type", "application/json")
 	shuffled, _ := strconv.ParseBool((req.URL.Query()["shuffled"][0]))
-	fmt.Println(shuffled)
+	requestedCards := strings.Split(req.URL.Query()["cards"][0], ",")
 	createDeckDto := CreateDeckDto{
-		Shuffled:      shuffled,
-		RequiredCards: []RequiredCard{},
+		Shuffled:       shuffled,
+		RequestedCards: ToRequestedCards(requestedCards),
 	}
-	deck, _ := deckService.Create(createDeckDto)
+	deck, err := deckService.Create(createDeckDto)
+
+	if err != nil {
+		resp.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(resp).Encode((ServiceError{Message: "Invalid card provided"}))
+		return
+	}
+
 	result, err := json.Marshal(deck)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
@@ -151,4 +159,14 @@ type CardDto struct {
 	Value string `json:"value"`
 	Suit  string `json:"suit"`
 	Code  string `json:"code"`
+}
+
+func ToRequestedCards(cards []string) []RequestedCard {
+	requestedCards := make([]RequestedCard, 0)
+
+	for _, card := range cards {
+		requestedCards = append(requestedCards, RequestedCard(card))
+	}
+
+	return requestedCards
 }
