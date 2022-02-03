@@ -85,7 +85,7 @@ func (c *controller) DrawCards(resp http.ResponseWriter, req *http.Request) {
 		fmt.Println("Error is not nil")
 		switch err.(type) {
 		case DeckNotFoundError:
-			resp.WriteHeader(http.StatusBadRequest)
+			resp.WriteHeader(http.StatusNotFound)
 			json.NewEncoder(resp).Encode((ServiceError{Message: "Deck not found"}))
 			return
 		case NotEnoughCardsError:
