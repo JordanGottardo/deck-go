@@ -9,6 +9,7 @@ import (
 type DeckService interface {
 	Validate(deck *Deck) error
 	Create(createDeckDto CreateDeckDto) (*Deck, error)
+	Get(id string) (*Deck, error)
 }
 
 type service struct{}
@@ -43,4 +44,8 @@ func (*service) Create(createDeckDto CreateDeckDto) (*Deck, error) {
 	}
 	deck.Id = uuid.NewString()
 	return deckRepo.Save(&deck)
+}
+
+func (*service) Get(id string) (*Deck, error) {
+	return deckRepo.Get(id)
 }

@@ -18,8 +18,8 @@ type card struct {
 	value string
 }
 
-var suits []string = []string{"Spades", "Diamonds", "Clubs", "Hearts"}
-var values []string = []string{"Ace", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Jack", "Queen", "King"}
+var suits []string = []string{"SPADES", "DIAMONDS", "CLUBS", "HEARTS"}
+var values []string = []string{"ACE", "1", "2", "3", "4", "5", "6", "7", "8", "9", "JACK", "QUEEN", "KING"}
 
 func newDeck() Deck {
 	var cards []card = make([]card, 0)
@@ -59,7 +59,7 @@ func (d *Deck) Shuffle() {
 
 func (d *Deck) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		Id         string `json:"id"`
+		Id         string `json:"deck_id"`
 		Shuffled   bool   `json:"shuffled"`
 		Remanining int    `json:"remaining"`
 	}{
