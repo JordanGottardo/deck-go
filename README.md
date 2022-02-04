@@ -27,4 +27,21 @@ go test .
 ```
 
 # Testing the API
-The server listens for requests on localhost:8000. You can import the Postman collection in this repository in your local Postman installation to invoke the API.
+The server listens for requests on localhost:8000. You can import the Postman collection (go-deck-web-api.postman_collection.json) in this repository into your local Postman installation to invoke the API.
+## Create deck
+You can invoke the create deck API at the following endpoint via POST
+```
+http://localhost:8000/decks?shuffled=true&cards=AS,1D
+```
+The API accepts shuffled and cards query parameters. If shuffled is not provided, the deck will not be shuffled. If cards is not provided, the full 52-cards deck will be built.
+## Open deck
+You can invoke the create deck API at the following endpoint via GET
+```
+http://localhost:8000/decks/{deck_id}
+```
+## Draw deck
+You can invoke the create deck API at the following endpoint via POST
+```
+http://localhost:8000/decks/{deck_id}/draw?amount=10
+```
+If the requested amount of cards to draw is higher than the current amount of cards in the deck, an error is returned and no cards will be drawn.
