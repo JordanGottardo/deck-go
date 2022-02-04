@@ -26,7 +26,6 @@ func GetCard(valueInitial string, suitInitial string) (card, error) {
 	var card card
 
 	for _, suit := range suits {
-		fmt.Println(suit, suitInitial)
 		if strings.HasPrefix(suit, suitInitial) {
 			card.suit = suit
 			break
@@ -95,16 +94,13 @@ func (d *Deck) Shuffle() {
 }
 
 func (d *Deck) Draw(amount int) ([]card, error) {
-	fmt.Println("Drawing cards ", amount)
-
+	fmt.Println("Drawing ", amount, " cards")
 	if amount > d.RemainingCards() {
 		return nil, NotEnoughCardsError("Not enough cards")
 	}
 
 	drawnCards := d.Cards[:amount]
 	d.Cards = d.Cards[amount:]
-
-	fmt.Println(len(d.Cards))
 
 	return drawnCards, nil
 }

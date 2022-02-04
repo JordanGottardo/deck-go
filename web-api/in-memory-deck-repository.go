@@ -24,7 +24,6 @@ func (r *repo) Get(id string) (*Deck, error) {
 }
 
 func (r *repo) DrawCards(id string, amount int) ([]card, error) {
-	fmt.Println("Repo drawCards")
 	deck, err := r.getDeck(id)
 
 	if err != nil {

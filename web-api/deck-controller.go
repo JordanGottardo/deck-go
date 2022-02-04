@@ -28,9 +28,26 @@ func NewDeckController(service DeckService) DeckController {
 }
 
 func (c *controller) CreateNewDeck(resp http.ResponseWriter, req *http.Request) {
-	resp.Header().Set("Content-type", "application/json")
-	shuffled, _ := strconv.ParseBool((req.URL.Query()["shuffled"][0]))
-	requestedCards := strings.Split(req.URL.Query()["cards"][0], ",")
+	SetJsonContentHeader(resp)
+	shuffledParam := req.URL.Query()["shuffled"]
+	shuffled := false
+	if len(shuffledParam) > 0 {
+		var err error
+		shuffled, err = strconv.ParseBool(shuffledParam[0])
+
+		if err != nil {
+			resp.WriteHeader(http.StatusBadRequest)
+			WriteError(resp, "Invalid shuffled value provided")
+			return
+		}
+	}
+
+	cardsParam := req.URL.Query()["cards"]
+	var requestedCards []string
+	if len(cardsParam) > 0 {
+		requestedCards = strings.Split(cardsParam[0], ",")
+	}
+
 	createDeckDto := CreateDeckDto{
 		Shuffled:       shuffled,
 		RequestedCards: ToRequestedCards(requestedCards),
@@ -39,29 +56,30 @@ func (c *controller) CreateNewDeck(resp http.ResponseWriter, req *http.Request) 
 
 	if err != nil {
 		resp.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(resp).Encode((ServiceError{Message: "Invalid card provided"}))
+		WriteError(resp, "Invalid card provided")
 		return
 	}
 
 	result, err := json.Marshal(deck)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
-		resp.Write([]byte(`{"error": "Error marshalling decks"}`))
+		WriteError(resp, "Error marshalling deck")
 		return
 	}
+
+	fmt.Println("Created new deck with id ", deck.Id)
 	resp.WriteHeader(http.StatusOK)
 	resp.Write(result)
 }
 
 func (c *controller) GetDeck(resp http.ResponseWriter, req *http.Request) {
-	resp.Header().Set("Content-type", "application/json")
+	SetJsonContentHeader(resp)
 	id := mux.Vars(req)["id"]
-	fmt.Println(id)
 
 	deck, err := deckService.Get(id)
 	if err != nil {
 		resp.WriteHeader(http.StatusNotFound)
-		resp.Write([]byte(`{"error": "Deck not found"}`))
+		WriteError(resp, "Deck not found")
 		return
 	}
 
@@ -69,7 +87,7 @@ func (c *controller) GetDeck(resp http.ResponseWriter, req *http.Request) {
 	result, err := json.Marshal(getDeckDto)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
-		resp.Write([]byte(`{"error": "Error marshalling decks"}`))
+		WriteError(resp, "Error marshalling deck")
 		return
 	}
 
@@ -78,27 +96,26 @@ func (c *controller) GetDeck(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (c *controller) DrawCards(resp http.ResponseWriter, req *http.Request) {
-	resp.Header().Set("Content-type", "application/json")
+	SetJsonContentHeader(resp)
 	deckId := mux.Vars(req)["id"]
 	cardsToDraw, err := strconv.Atoi(req.URL.Query().Get("amount"))
+
 	if err != nil {
 		resp.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(resp).Encode((ServiceError{Message: "Cannot parse amount"}))
-		fmt.Println(err)
+		WriteError(resp, "Cannot parse amount")
 		return
 	}
 
 	drawnCards, err := deckService.DrawCards(deckId, cardsToDraw)
 	if err != nil {
-		fmt.Println("Error is not nil")
 		switch err.(type) {
 		case DeckNotFoundError:
 			resp.WriteHeader(http.StatusNotFound)
-			json.NewEncoder(resp).Encode((ServiceError{Message: "Deck not found"}))
+			WriteError(resp, "Deck not found")
 			return
 		case NotEnoughCardsError:
 			resp.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(resp).Encode((ServiceError{Message: "Invalid amount: not enough cards to draw"}))
+			WriteError(resp, "Invalid amount: not enough cards to draw")
 			return
 		}
 	}
@@ -106,12 +123,22 @@ func (c *controller) DrawCards(resp http.ResponseWriter, req *http.Request) {
 	result, err := json.Marshal(ToCardDtoSlice(drawnCards))
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
-		resp.Write([]byte(`{"error": "Error marshalling decks"}`))
+		WriteError(resp, "Error marshalling deck")
 		return
 	}
 
 	resp.WriteHeader(http.StatusOK)
 	resp.Write(result)
+}
+
+// Utility methods
+
+func SetJsonContentHeader(resp http.ResponseWriter) {
+	resp.Header().Set("Content-type", "application/json")
+}
+
+func WriteError(resp http.ResponseWriter, errorMessage string) {
+	json.NewEncoder(resp).Encode((ServiceError{Message: errorMessage}))
 }
 
 func ToGetDeckDto(deck *Deck) GetDeckDto {

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 )
 
@@ -46,12 +44,10 @@ func (*service) Create(createDeckDto CreateDeckDto) (*Deck, error) {
 
 		deck = newDeckWithRequestedCards(cards)
 	} else {
-		fmt.Println("NewDeck")
 		deck = newDeck()
 	}
 
 	if createDeckDto.Shuffled {
-		fmt.Println("Shuffling deck")
 		deck.Shuffle()
 	}
 	deck.Id = uuid.NewString()
